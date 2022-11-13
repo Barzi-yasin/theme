@@ -1,73 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:themeonline/page/home_page.dart';
+import 'package:themeonline/provider/theme_provider.dart';
+import 'package:themeonline/page/home_page.dart';
 
-void main() => runApp(MyApp());
+import 'provider/theme_provider.dart';
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Navigation Over Screens',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-//      home: MainPage(),
+  static const String title = 'Light & Dark Theme';
 
-      // Declare routes
-      routes: {
-        // Main initial route
-        '/': (context) => MainPage(),
-        // Second route
-        '/second': (context) => SecondPage(),
-      },
-      initialRoute: '/',
-    );
-  }
-}
-
-class MainPage extends StatelessWidget {
   @override
-  Widget build(BuildContext context) =>
-      Scaffold(
-        appBar: AppBar(
-          title: Text('Navigation over screens'),
-        ),
-        body: Container(
-          child: Column(
-            children: <Widget>[
-              // Navigate using declared route name
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/second'),
-                child: Text('Navigate using routes'),
-              ),
-              // Navigate using simple push method
-              ElevatedButton(
-                onPressed: () =>
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SecondPage()),
-                    ),
-                child: Text('Navigate using push method'),
-              )
-            ],
-          ),
-        ),
+  Widget build(BuildContext context) => ChangeNotifierProvider(
+        create: (context) => ThemeProvider(),
+        builder: (context, _) {
+          final themeProvider = Provider.of<ThemeProvider>(context);
+
+          return MaterialApp(
+            title: title,
+            themeMode: themeProvider.themeMode,
+            theme: MyThemes.lightTheme,
+            darkTheme: MyThemes.darkTheme,
+            home: HomePage(),
+          );
+        },
       );
-}
-
-class SecondPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Second screen'),
-      ),
-      body: Container(
-        child: ElevatedButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Back'),
-        ),
-      ),
-    );
-  }
 }
